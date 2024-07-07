@@ -7,8 +7,12 @@ class ArrayGeneratorService implements GeneratorServiceInterface
     public function __construct(
         private readonly int $length,
         private readonly GeneratorServiceInterface $generatorService
-    ) {}
+    ) {
+    }
 
+    /**
+     * @return mixed[]
+     */
     public function generate(): array
     {
         $array = [];

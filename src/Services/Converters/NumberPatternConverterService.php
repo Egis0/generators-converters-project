@@ -4,13 +4,15 @@ namespace App\Services\Converters;
 
 class NumberPatternConverterService extends AbstractConverterService
 {
+    /** @var string[] */
     private readonly array $alphabet;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->alphabet = range('a', 'z');
     }
 
-    protected function execute(string $string): string
+    public function execute(string $string): string
     {
         $convertedString = '';
         $length = strlen($string);
@@ -18,7 +20,7 @@ class NumberPatternConverterService extends AbstractConverterService
             if (is_numeric($string[$i])) {
                 $convertedString .= $string[$i];
             } else {
-                $convertedString .= '/' . (array_search(strtolower($string[$i]), $this->alphabet) + 1) . '/';
+                $convertedString .= '/' . ((int) array_search(strtolower($string[$i]), $this->alphabet) + 1) . '/';
             }
         }
 

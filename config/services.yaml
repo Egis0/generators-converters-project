@@ -1,0 +1,15 @@
+parameters:
+  string_generator.length: 5
+  array_generator.length: 10
+
+services:
+  App\Services\Generators\StringGeneratorService:
+    class: App\Services\Generators\StringGeneratorService
+    arguments: ['%string_generator.length%']
+  App\Services\Generators\ArrayGeneratorService:
+    class: App\Services\Generators\ArrayGeneratorService
+    arguments: ['%array_generator.length%', '@App\Services\Generators\StringGeneratorService']
+  App\Services\Converters\NumberPatternConverterService:
+    class: App\Services\Converters\NumberPatternConverterService
+  App\Services\Converters\Rot13ConverterService:
+    class: App\Services\Converters\Rot13ConverterService

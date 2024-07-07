@@ -1,40 +1,43 @@
 <?php
 
-use App\Services\Converters\NumberPatternConverterService;
-use App\Services\Converters\Rot13ConverterService;
-use App\Services\Generators\ArrayGeneratorService;
-use App\Services\Generators\StringGeneratorService;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
 $container = new ContainerBuilder();
+$loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
+$loader->load('services.yaml');
 
-$container->setParameter('string_generator.length', 5);
-$container->register(StringGeneratorService::class, StringGeneratorService::class)
-    ->addArgument('%string_generator.length%');
+$generatorClassNames = $converterClassNames = [];
+foreach (array_keys($container->getDefinitions()) as $serviceName) {
+    if (str_starts_with($serviceName, 'App\Services\Generators')) {
+        $generators[] = $container->get($serviceName);
+    }
+    if (str_starts_with($serviceName, 'App\Services\Converters')) {
+        $converters[] = $container->get($serviceName);
+    }
+}
 
-$container->setParameter('array_generator.length', 10);
-$container->register(ArrayGeneratorService::class, ArrayGeneratorService::class)
-    ->addArgument('%array_generator.length%')
-    ->addArgument(new Reference(StringGeneratorService::class));
+if (empty($generators)) {
+    throw new Exception('Container doesn\'t have any generators');
+}
 
-$container->register(NumberPatternConverterService::class, NumberPatternConverterService::class);
-$container->register(Rot13ConverterService::class, Rot13ConverterService::class);
+$generatorsMaxIndex = max(0, count($generators) - 1);
+$generatorsCollection = new ArrayCollection();
+for ($i = 0; $i < 10; $i++) {
+    $generatorsCollection->add($generators[random_int(0, $generatorsMaxIndex)]->generate());
+}
+print_r($generatorsCollection);
 
-//$stringGeneratorService = $container->get(StringGeneratorService::class);
-//$response = $stringGeneratorService->generate();
-//var_dump($response);
+if (empty($converters)) {
+    throw new Exception('Container doesn\'t have any converters');
+}
 
-//$arrayGeneratorService = $container->get(ArrayGeneratorService::class);
-//$response = $arrayGeneratorService->generate();
-//var_dump($response);
-
-//$rot13ConverterService = $container->get(Rot13ConverterService::class);
-//$result = $rot13ConverterService->convert('22aAcd');
-//var_dump($result);
-
-//$numberPatternConverterService = $container->get(NumberPatternConverterService::class);
-//$result = $numberPatternConverterService->convert('22aAcd');
-//var_dump($result);
+$convertersMaxIndex = max(0, count($converters) - 1);
+$convertedCollection = $generatorsCollection->map(function ($value) use ($convertersMaxIndex, $converters) {
+    return $converters[random_int(0, $convertersMaxIndex)]->convert($value);
+});
+print_r($convertedCollection);

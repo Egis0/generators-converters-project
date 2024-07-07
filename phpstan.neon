@@ -1,0 +1,16 @@
+parameters:
+  level: 9
+  paths:
+    - src
+    - tests
+    - index.php
+  ignoreErrors:
+    -
+      message: '#Call to an undefined method object::execute\(\).#'
+      path:  tests\NumberPatternConverterServiceTest.php
+    -
+      message: '#Call to an undefined method object::generate\(\).#'
+      path:  tests\ArrayGeneratorServiceTest.php
+    -
+      message: '#Call to an undefined method object::generate\(\).#'
+      path:  tests\StringGeneratorServiceTest.php

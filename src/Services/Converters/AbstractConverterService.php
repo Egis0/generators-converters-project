@@ -4,12 +4,16 @@ namespace App\Services\Converters;
 
 abstract class AbstractConverterService
 {
+    /**
+     * @param string|string[] $convertee
+     * @return string|string[]
+     */
     public function convert(string|array $convertee): string|array
     {
         if (is_array($convertee)) {
             $converted = [];
             foreach ($convertee as $converteeInner) {
-                $converted[] = $this->convert($converteeInner);
+                $converted[] = $this->execute($converteeInner);
             }
 
             return $converted;
@@ -18,5 +22,5 @@ abstract class AbstractConverterService
         return $this->execute($convertee);
     }
 
-    abstract protected function execute(string $string): string;
+    abstract public function execute(string $string): string;
 }
